@@ -34,6 +34,22 @@ gcloud compute routers nats create apics-cloud-nat-config \
     --nat-all-subnet-ip-ranges \
     --enable-logging
 ```
+
+5. Now connector can be used when deploying Cloud Functions. Sample deploy:
+
+```bash
+# Configurate the connector
+gcloud functions deploy listen \
+    --runtime python37 \
+    --entry-point listen \
+    --trigger-http \
+    --allow-unauthenticated \
+    --vpc-connector orchestration-connector \
+    --egress-settings all
+```
+
+
+
 ## Notes and prerequisites
 
 Test CF
@@ -55,7 +71,7 @@ gcloud functions deploy listen \
     --allow-unauthenticated
 ```
 	
-curl <endpoint URL>
+Initial VPC
 
 ```bash
 # Create VPC
@@ -64,4 +80,20 @@ gcloud services enable compute.googleapis.com
 gcloud compute networks create apics-service-network \
     --subnet-mode=custom \
     --bgp-routing-mode=regional
+```
+
+Make sure CF service account has permissions
+
+```bash
+# Grant Permissions 
+export PROJECT_ID=$(gcloud config list --format 'value(core.project)')
+export PROJECT_NUMBER=$(gcloud projects list --filter="$PROJECT_ID" --format="value(PROJECT_NUMBER)")
+
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+--member=serviceAccount:service-$PROJECT_NUMBER@gcf-admin-robot.iam.gserviceaccount.com \
+--role=roles/viewer
+
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+--member=serviceAccount:service-$PROJECT_NUMBER@gcf-admin-robot.iam.gserviceaccount.com \
+--role=roles/compute.networkUser
 ```
