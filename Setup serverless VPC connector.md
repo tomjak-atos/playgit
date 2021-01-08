@@ -31,7 +31,7 @@ gcloud compute routers create apics-router \
 ```bash
 gcloud compute routers nats create apics-cloud-nat-config \
     --router=apics-router \
-                --router-region europe-west3 \
+    --router-region europe-west3 \
     --nat-external-ip-pool=apics-static-ip \
     --nat-all-subnet-ip-ranges \
     --enable-logging
@@ -79,6 +79,13 @@ gcloud services enable compute.googleapis.com
 gcloud compute networks create apics-service-network \
     --subnet-mode=custom \
     --bgp-routing-mode=regional
+
+gcloud compute networks subnets create apics-logging-subnet	\
+    --network=apics-service-network \
+    --range=10.128.122.0/28 \
+    --region=europe-west3
+
+
 ```
 
 Make sure CF service account has permission viewer and NetworkUser
