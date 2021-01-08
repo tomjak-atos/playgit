@@ -15,6 +15,8 @@ gcloud compute networks vpc-access connectors create orchestration-connector \
 ```bash
 gcloud compute addresses create apics-static-ip \
     --region=europe-west3
+
+gcloud compute addresses list
 ```
 3. Create router
 
@@ -56,19 +58,16 @@ Test CF
 main.py
 
 ```bash
+
 # This function will return the IP address for egress
 import requests
 import json
 
+
 def listen(request):
     result = requests.get("https://api.ipify.org?format=json")
     return json.dumps(result.json())
-	
-gcloud functions deploy listen \
-    --runtime python37 \
-    --entry-point test_ip \
-    --trigger-http \
-    --allow-unauthenticated
+
 ```
 	
 Initial VPC
@@ -82,7 +81,7 @@ gcloud compute networks create apics-service-network \
     --bgp-routing-mode=regional
 ```
 
-Make sure CF service account has permissions
+Make sure CF service account has permission viewer and NetworkUser
 
 ```bash
 # Grant Permissions 
